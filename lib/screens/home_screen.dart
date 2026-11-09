@@ -8,11 +8,19 @@ import '../widgets/weather_stat_card.dart';
 import '../animations/sunny_animation.dart';
 import '../animations/cloud_animation.dart';
 import '../animations/rainy_animation.dart';
+import '../animations/storm_cloud_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
+  final WeatherCondition condition;
+  final ValueChanged<WeatherCondition> onConditionChanged;
 
-  const HomeScreen({super.key, required this.weather});
+  const HomeScreen({
+    super.key,
+    required this.weather,
+    required this.condition,
+    required this.onConditionChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +39,42 @@ class HomeScreen extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              const Positioned.fill(
-                child: IgnorePointer(child: RainyAnimation()),
-              ),
-              //Background sun
-              Positioned(
-                top: -75,
-                right: -80,
+              // Rainy and Thunderstorm
+              if (condition == WeatherCondition.rainy ||
+                  condition == WeatherCondition.thunderstorm) ...[
+                const Positioned.fill(
+                  child: IgnorePointer(child: RainyAnimation()),
+                ),
 
-                child: IgnorePointer(child: SunnyAnimation()),
-              ),
-              //clouds
-              Positioned(
-                top: 80,
-                left: -20,
-                child: IgnorePointer(child: CloudAnimation()),
-              ),
+                Positioned(
+                  top: -10,
+                  left: -20,
+                  right: -20,
+                  child: IgnorePointer(child: StormCloudAnimation()),
+                ),
+              ]
+              // Sunny
+              else if (condition == WeatherCondition.sunny) ...[
+                Positioned(
+                  top: -75,
+                  right: -80,
+                  child: IgnorePointer(child: SunnyAnimation()),
+                ),
+
+                Positioned(
+                  top: 80,
+                  left: -20,
+                  child: IgnorePointer(child: CloudAnimation()),
+                ),
+              ]
+              // Cloudy
+              else if (condition == WeatherCondition.cloudy) ...[
+                Positioned(
+                  top: 20,
+                  left: -20,
+                  child: IgnorePointer(child: StormCloudAnimation()),
+                ),
+              ],
 
               SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -55,6 +83,8 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     WeatherHeader(location: 'Ghaziabad, India'),
+
+                    _buildWeatherSelector(),
 
                     const SizedBox(height: 35),
 
@@ -118,6 +148,37 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeatherSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<WeatherCondition>(
+          value: condition,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF243B55),
+          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+          style: const TextStyle(color: Colors.white, fontSize: 15),
+          items: WeatherCondition.values.map((weatherCondition) {
+            return DropdownMenuItem(
+              value: weatherCondition,
+              child: Text(weatherCondition.name.toUpperCase()),
+            );
+          }).toList(),
+          onChanged: (newCondition) {
+            if (newCondition != null) {
+              onConditionChanged(newCondition);
+            }
+          },
         ),
       ),
     );

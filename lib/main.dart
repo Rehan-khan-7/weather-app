@@ -8,15 +8,27 @@ void main() {
   runApp(const WeatherApp());
 }
 
-class WeatherApp extends StatelessWidget {
+class WeatherApp extends StatefulWidget {
   const WeatherApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<WeatherApp> createState() => _WeatherAppState();
+}
 
-    final weather = WeatherThemes.getTheme(
-      WeatherCondition.sunny,
-    );
+class _WeatherAppState extends State<WeatherApp> {
+  // Currently selected weather condition
+  WeatherCondition _condition = WeatherCondition.sunny;
+
+  void changeWeather(WeatherCondition condition) {
+    setState(() {
+      _condition = condition;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Get theme according to selected condition
+    final weather = WeatherThemes.getTheme(_condition);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -26,6 +38,8 @@ class WeatherApp extends StatelessWidget {
 
       home: HomeScreen(
         weather: weather,
+        condition: _condition,
+        onConditionChanged: changeWeather,
       ),
     );
   }
