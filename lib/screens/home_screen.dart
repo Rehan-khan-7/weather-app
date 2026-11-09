@@ -7,6 +7,7 @@ import '../widgets/hourly_forecast.dart';
 import '../widgets/weather_stat_card.dart';
 import '../animations/sunny_animation.dart';
 import '../animations/cloud_animation.dart';
+import '../animations/rainy_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
@@ -30,6 +31,9 @@ class HomeScreen extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
+              const Positioned.fill(
+                child: IgnorePointer(child: RainyAnimation()),
+              ),
               //Background sun
               Positioned(
                 top: -75,
@@ -43,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                 left: -20,
                 child: IgnorePointer(child: CloudAnimation()),
               ),
-              
+
               SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
 
