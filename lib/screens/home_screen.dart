@@ -9,6 +9,7 @@ import '../animations/sunny_animation.dart';
 import '../animations/cloud_animation.dart';
 import '../animations/rainy_animation.dart';
 import '../animations/storm_cloud_animation.dart';
+import '../animations/cloudy_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
@@ -70,9 +71,10 @@ class HomeScreen extends StatelessWidget {
               // Cloudy
               else if (condition == WeatherCondition.cloudy) ...[
                 Positioned(
-                  top: 20,
-                  left: -20,
-                  child: IgnorePointer(child: StormCloudAnimation()),
+                  top: -40,
+                  left: -40,
+                  right: -40,
+                  child: IgnorePointer(child: CloudyAnimation()),
                 ),
               ],
 
@@ -89,7 +91,10 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 35),
 
                     // Current Temperature
-                    CurrentWeatherCard(accentColor: weather.accentColor),
+                    CurrentWeatherCard(
+                      accentColor: weather.accentColor,
+                      condition: condition,
+                    ),
 
                     const SizedBox(height: 35),
 
