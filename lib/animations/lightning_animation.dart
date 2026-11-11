@@ -76,17 +76,43 @@ class _LightningAnimationState extends State<LightningAnimation> {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: AnimatedOpacity(
-        opacity: _isFlashing ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 40),
-        child: CustomPaint(
-          size: Size.infinite,
-          painter: LightningPainter(
-            lightningX: _lightningX,
-            lightningY: _lightningY,
-            seed: _seed,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Full sky illumination
+          AnimatedOpacity(
+            opacity: _isFlashing ? 0.16 : 0.0,
+            duration: const Duration(milliseconds: 45),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.topCenter,
+                  radius: 1.2,
+                  colors: [
+                    Color(0xFFB8D8FF),
+                    Color(0xFF647FA8),
+                    Color(0x00000000),
+                  ],
+                  stops: [0.0, 0.45, 1.0],
+                ),
+              ),
+            ),
           ),
-        ),
+
+          // Lightning bolt
+          AnimatedOpacity(
+            opacity: _isFlashing ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 40),
+            child: CustomPaint(
+              size: Size.infinite,
+              painter: LightningPainter(
+                lightningX: _lightningX,
+                lightningY: _lightningY,
+                seed: _seed,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -106,54 +132,84 @@ class LightningPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(seed);
-    final path = Path();
+
+    final mainPath = Path();
+    final branchPath = Path();
 
     double x = size.width * lightningX;
     double y = size.height * lightningY;
 
-    path.moveTo(x, y);
+    mainPath.moveTo(x, y);
 
-    final startX = x;
+    final points = <Offset>[Offset(x, y)];
 
     // Main lightning bolt
-    for (int i = 0; i < 9; i++) {
-      x += (random.nextDouble() - 0.5) * size.width * 0.12;
-      y += size.height * (0.035 + random.nextDouble() * 0.01);
+    for (int i = 0; i < 11; i++) {
+      x += (random.nextDouble() - 0.5) * size.width * 0.09;
+      y += size.height * (0.035 + random.nextDouble() * 0.025);
 
-      path.lineTo(x, y);
+      x = x.clamp(size.width * 0.05, size.width * 0.95);
 
-      // Random branches
-      if (i == 2 || i == 4 || i == 6) {
-        final branchX = x + (random.nextDouble() - 0.5) * size.width * 0.22;
+      final point = Offset(x, y);
 
-        final branchY = y + size.height * 0.06;
+      points.add(point);
+      mainPath.lineTo(x, y);
+    }
 
-        path.moveTo(x, y);
-        path.lineTo(branchX, branchY);
-        path.moveTo(x, y);
+    // Natural branching
+    for (int i = 2; i < points.length - 1; i += 2) {
+      final start = points[i];
+
+      final direction = random.nextBool() ? 1.0 : -1.0;
+
+      double branchX = start.dx;
+      double branchY = start.dy;
+
+      branchPath.moveTo(branchX, branchY);
+
+      final branchLength = 2 + random.nextInt(3);
+
+      for (int j = 0; j < branchLength; j++) {
+        branchX +=
+            direction * size.width * (0.015 + random.nextDouble() * 0.025);
+
+        branchY += size.height * 0.025;
+
+        branchPath.lineTo(branchX, branchY);
       }
     }
 
-    // Glow effect
+    // Combined glow
     final glowPaint = Paint()
       ..color = const Color(0xFFB8D8FF).withOpacity(0.9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 16
+      ..strokeWidth = 15
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14);
 
-    canvas.drawPath(path, glowPaint);
+    canvas.drawPath(mainPath, glowPaint);
+    canvas.drawPath(branchPath, glowPaint);
 
-    // Bright lightning
-    final lightningPaint = Paint()
+    // Main bright bolt
+    final mainPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2.8
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawPath(path, lightningPaint);
+    canvas.drawPath(mainPath, mainPaint);
+
+    // Smaller branches
+    final branchPaint = Paint()
+      ..color = const Color(0xFFEAF4FF)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    canvas.drawPath(branchPath, branchPaint);
   }
 
   @override
