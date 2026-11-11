@@ -10,6 +10,8 @@ import '../animations/cloud_animation.dart';
 import '../animations/rainy_animation.dart';
 import '../animations/storm_cloud_animation.dart';
 import '../animations/cloudy_animation.dart';
+import '../animations/thunderstorm_cloud_animation.dart';
+import '../animations/lightning_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
@@ -41,8 +43,8 @@ class HomeScreen extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               // Rainy and Thunderstorm
-              if (condition == WeatherCondition.rainy ||
-                  condition == WeatherCondition.thunderstorm) ...[
+              // Rainy Weather
+              if (condition == WeatherCondition.rainy) ...[
                 const Positioned.fill(
                   child: IgnorePointer(child: RainyAnimation()),
                 ),
@@ -53,6 +55,23 @@ class HomeScreen extends StatelessWidget {
                   right: -20,
                   child: IgnorePointer(child: StormCloudAnimation()),
                 ),
+              ],
+
+              // Thunderstorm Weather
+              if (condition == WeatherCondition.thunderstorm) ...[
+                const Positioned.fill(
+                  child: IgnorePointer(child: RainyAnimation()),
+                ),
+
+                Positioned(
+                  top: -30,
+                  left: -30,
+                  right: -30,
+                  child: IgnorePointer(child: ThunderstormCloudAnimation()),
+                ),
+
+                // Lightning layer
+                const Positioned.fill(child: LightningAnimation()),
               ]
               // Sunny
               else if (condition == WeatherCondition.sunny) ...[
