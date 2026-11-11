@@ -13,6 +13,7 @@ import '../animations/thunderstorm_cloud_animation.dart';
 import '../animations/lightning_animation.dart';
 import '../animations/rainy_cloud_animation.dart';
 import '../animations/snow_animation.dart';
+import '../animations/night_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
@@ -99,10 +100,16 @@ class HomeScreen extends StatelessWidget {
                   child: IgnorePointer(child: CloudyAnimation()),
                 ),
               ],
-
+              //snowy
               if (condition == WeatherCondition.snowy) ...[
                 const Positioned.fill(
                   child: IgnorePointer(child: SnowAnimation()),
+                ),
+              ],
+              //night
+              if (condition == WeatherCondition.night) ...[
+                const Positioned.fill(
+                  child: IgnorePointer(child: NightAnimation()),
                 ),
               ],
 
