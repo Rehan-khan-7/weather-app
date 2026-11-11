@@ -8,10 +8,10 @@ import '../widgets/weather_stat_card.dart';
 import '../animations/sunny_animation.dart';
 import '../animations/cloud_animation.dart';
 import '../animations/rainy_animation.dart';
-import '../animations/storm_cloud_animation.dart';
 import '../animations/cloudy_animation.dart';
 import '../animations/thunderstorm_cloud_animation.dart';
 import '../animations/lightning_animation.dart';
+import '../animations/rainy_cloud_animation.dart';
 
 class HomeScreen extends StatelessWidget {
   final WeatherThemeData weather;
@@ -45,15 +45,17 @@ class HomeScreen extends StatelessWidget {
               // Rainy and Thunderstorm
               // Rainy Weather
               if (condition == WeatherCondition.rainy) ...[
+                // Existing diagonal rain
                 const Positioned.fill(
                   child: IgnorePointer(child: RainyAnimation()),
                 ),
 
+                // New rainy clouds
                 Positioned(
                   top: -10,
                   left: -20,
                   right: -20,
-                  child: IgnorePointer(child: StormCloudAnimation()),
+                  child: IgnorePointer(child: RainyCloudAnimation()),
                 ),
               ],
 
