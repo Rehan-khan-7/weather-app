@@ -14,8 +14,13 @@ import '../animations/lightning_animation.dart';
 import '../animations/rainy_cloud_animation.dart';
 import '../animations/snow_animation.dart';
 import '../animations/night_animation.dart';
+import '../services/weather_api_service.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'package:provider/provider.dart';
+
+import '../providers/weather_provider.dart';
+
+class HomeScreen extends StatefulWidget {
   final WeatherThemeData weather;
   final WeatherCondition condition;
   final ValueChanged<WeatherCondition> onConditionChanged;
@@ -28,13 +33,29 @@ class HomeScreen extends StatelessWidget {
   });
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WeatherProvider>().fetchWeather();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final weatherProvider = context.watch<WeatherProvider>();
+
     return Scaffold(
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: weather.backgroundGradient,
+            colors: widget.weather.backgroundGradient,
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -46,7 +67,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               // Rainy and Thunderstorm
               // Rainy Weather
-              if (condition == WeatherCondition.rainy) ...[
+              if (widget.condition == WeatherCondition.rainy) ...[
                 // Existing diagonal rain
                 const Positioned.fill(
                   child: IgnorePointer(child: RainyAnimation()),
@@ -62,7 +83,7 @@ class HomeScreen extends StatelessWidget {
               ],
 
               // Thunderstorm Weather
-              if (condition == WeatherCondition.thunderstorm) ...[
+              if (widget.condition == WeatherCondition.thunderstorm) ...[
                 const Positioned.fill(
                   child: IgnorePointer(child: RainyAnimation()),
                 ),
@@ -78,7 +99,7 @@ class HomeScreen extends StatelessWidget {
                 const Positioned.fill(child: LightningAnimation()),
               ]
               // Sunny
-              else if (condition == WeatherCondition.sunny) ...[
+              else if (widget.condition == WeatherCondition.sunny) ...[
                 Positioned(
                   top: -75,
                   right: -80,
@@ -92,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ]
               // Cloudy
-              else if (condition == WeatherCondition.cloudy) ...[
+              else if (widget.condition == WeatherCondition.cloudy) ...[
                 Positioned(
                   top: -40,
                   left: -40,
@@ -101,13 +122,13 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
               //snowy
-              if (condition == WeatherCondition.snowy) ...[
+              if (widget.condition == WeatherCondition.snowy) ...[
                 const Positioned.fill(
                   child: IgnorePointer(child: SnowAnimation()),
                 ),
               ],
               //night
-              if (condition == WeatherCondition.night) ...[
+              if (widget.condition == WeatherCondition.night) ...[
                 const Positioned.fill(
                   child: IgnorePointer(child: NightAnimation()),
                 ),
@@ -123,12 +144,61 @@ class HomeScreen extends StatelessWidget {
 
                     _buildWeatherSelector(),
 
+                    const SizedBox(height: 20),
+
+                    if (weatherProvider.isLoading)
+                      const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
+                    else if (weatherProvider.error != null)
+                      Text(
+                        'Error: ${weatherProvider.error}',
+                        style: const TextStyle(color: Colors.red),
+                      )
+                    else if (weatherProvider.weatherData != null)
+                      Text(
+                        'Live Temperature: '
+                        '${weatherProvider.weatherData!.current.temperature}°C',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+
+                    const SizedBox(height: 35),
+
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            final weatherData = await WeatherApiService()
+                                .fetchWeather();
+
+                            print('API Request Successful');
+                            print(
+                              'Temperature: ${weatherData.current.temperature}°C',
+                            );
+                            print('Humidity: ${weatherData.current.humidity}%');
+                            print(
+                              'Wind Speed: ${weatherData.current.windSpeed} km/h',
+                            );
+                          } catch (e) {
+                            print('API Error: $e');
+                          }
+                        },
+                        child: const Text('Test Weather API'),
+                      ),
+                    ),
+
                     const SizedBox(height: 35),
 
                     // Current Temperature
                     CurrentWeatherCard(
-                      accentColor: weather.accentColor,
-                      condition: condition,
+                      accentColor: widget.weather.accentColor,
+                      condition: widget.condition,
+                      temperature:
+                          weatherProvider.weatherData?.current.temperature,
                     ),
 
                     const SizedBox(height: 35),
@@ -159,27 +229,31 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         WeatherStatCard(
                           title: 'Humidity',
-                          value: '65%',
+                          value: weatherProvider.weatherData == null
+                              ? '--'
+                              : '${weatherProvider.weatherData!.current.humidity}%',
                           icon: Icons.water_drop_outlined,
-                          accentColor: weather.accentColor,
+                          accentColor: widget.weather.accentColor,
                         ),
                         WeatherStatCard(
                           title: 'Wind Speed',
-                          value: '12 km/h',
+                          value: weatherProvider.weatherData == null
+                              ? '--'
+                              : '${weatherProvider.weatherData!.current.windSpeed.toStringAsFixed(1)} km/h',
                           icon: Icons.air,
-                          accentColor: weather.accentColor,
+                          accentColor: widget.weather.accentColor,
                         ),
                         WeatherStatCard(
                           title: 'UV Index',
                           value: '5',
                           icon: Icons.wb_sunny_outlined,
-                          accentColor: weather.accentColor,
+                          accentColor: widget.weather.accentColor,
                         ),
                         WeatherStatCard(
                           title: 'Visibility',
                           value: '10 km',
                           icon: Icons.visibility_outlined,
-                          accentColor: weather.accentColor,
+                          accentColor: widget.weather.accentColor,
                         ),
                       ],
                     ),
@@ -203,7 +277,7 @@ class HomeScreen extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<WeatherCondition>(
-          value: condition,
+          value: widget.condition,
           isExpanded: true,
           dropdownColor: const Color(0xFF243B55),
           icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
@@ -216,7 +290,7 @@ class HomeScreen extends StatelessWidget {
           }).toList(),
           onChanged: (newCondition) {
             if (newCondition != null) {
-              onConditionChanged(newCondition);
+              widget.onConditionChanged(newCondition);
             }
           },
         ),
