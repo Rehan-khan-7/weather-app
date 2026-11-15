@@ -20,12 +20,46 @@ class WeatherThemeData {
 }
 
 class WeatherThemes {
+  // API weather code ko WeatherCondition mein convert karta hai.
+  static WeatherCondition getCondition(int weatherCode, bool isDay) {
+    // Night
+    if (!isDay && weatherCode <= 3) {
+      return WeatherCondition.night;
+    }
 
-  static WeatherThemeData getTheme(
-      WeatherCondition condition) {
+    // Sunny
+    if (weatherCode == 0) {
+      return WeatherCondition.sunny;
+    }
 
+    // Cloudy and fog
+    if ([1, 2, 3, 45, 48].contains(weatherCode)) {
+      return WeatherCondition.cloudy;
+    }
+
+    // Rain
+    if ((weatherCode >= 51 && weatherCode <= 67) ||
+        (weatherCode >= 80 && weatherCode <= 82)) {
+      return WeatherCondition.rainy;
+    }
+
+    // Snow
+    if ((weatherCode >= 71 && weatherCode <= 77) ||
+        (weatherCode >= 85 && weatherCode <= 86)) {
+      return WeatherCondition.snowy;
+    }
+
+    // Thunderstorm
+    if (weatherCode >= 95 && weatherCode <= 99) {
+      return WeatherCondition.thunderstorm;
+    }
+
+    return WeatherCondition.cloudy;
+  }
+
+  // WeatherCondition ke according theme return karta hai.
+  static WeatherThemeData getTheme(WeatherCondition condition) {
     switch (condition) {
-
       case WeatherCondition.sunny:
         return const WeatherThemeData(
           backgroundGradient: [

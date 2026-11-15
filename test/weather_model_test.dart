@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:weather_app/models/weather_model.dart';
+import 'package:weather_app/theme/weather_theme.dart';
 
 void main() {
   test('JSON should convert into Weather object', () {
@@ -87,5 +88,19 @@ void main() {
     };
 
     expect(() => WeatherResponse.fromJson(json), throwsFormatException);
+  });
+
+  test('Weather code should map to correct condition', () {
+    expect(WeatherThemes.getCondition(0, true), WeatherCondition.sunny);
+
+    expect(WeatherThemes.getCondition(0, false), WeatherCondition.night);
+
+    expect(WeatherThemes.getCondition(3, true), WeatherCondition.cloudy);
+
+    expect(WeatherThemes.getCondition(61, true), WeatherCondition.rainy);
+
+    expect(WeatherThemes.getCondition(95, true), WeatherCondition.thunderstorm);
+
+    expect(WeatherThemes.getCondition(71, true), WeatherCondition.snowy);
   });
 }
