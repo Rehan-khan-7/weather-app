@@ -142,9 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     WeatherHeader(location: 'Ghaziabad, India'),
 
-                    _buildWeatherSelector(),
-
-                    const SizedBox(height: 20),
 
                     if (weatherProvider.isLoading)
                       const Center(
@@ -154,42 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Error: ${weatherProvider.error}',
                         style: const TextStyle(color: Colors.red),
-                      )
-                    else if (weatherProvider.weatherData != null)
-                      Text(
-                        'Live Temperature: '
-                        '${weatherProvider.weatherData!.current.temperature}°C',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
-
-                    const SizedBox(height: 35),
-
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            final weatherData = await WeatherApiService()
-                                .fetchWeather();
-
-                            print('API Request Successful');
-                            print(
-                              'Temperature: ${weatherData.current.temperature}°C',
-                            );
-                            print('Humidity: ${weatherData.current.humidity}%');
-                            print(
-                              'Wind Speed: ${weatherData.current.windSpeed} km/h',
-                            );
-                          } catch (e) {
-                            print('API Error: $e');
-                          }
-                        },
-                        child: const Text('Test Weather API'),
-                      ),
-                    ),
+                    
 
                     const SizedBox(height: 35),
 
