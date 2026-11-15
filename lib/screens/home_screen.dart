@@ -14,7 +14,7 @@ import '../animations/lightning_animation.dart';
 import '../animations/rainy_cloud_animation.dart';
 import '../animations/snow_animation.dart';
 import '../animations/night_animation.dart';
-import '../services/weather_api_service.dart';
+
 
 import 'package:provider/provider.dart';
 
@@ -140,8 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    WeatherHeader(location: 'Ghaziabad, India'),
-
+                    WeatherHeader(
+                      location:
+                          weatherProvider.locationName ??
+                          'Detecting location...',
+                    ),
 
                     if (weatherProvider.isLoading)
                       const Center(
@@ -152,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Error: ${weatherProvider.error}',
                         style: const TextStyle(color: Colors.red),
                       ),
-                    
 
                     const SizedBox(height: 35),
 
