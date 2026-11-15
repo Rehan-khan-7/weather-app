@@ -34,6 +34,13 @@ void main() {
         'relative_humidity_2m': [65, 68],
         'precipitation_probability': [10, 15],
         'weather_code': [2, 3],
+        'is_day': [0, 0],
+      },
+      'daily': {
+        'time': ['2026-11-15', '2026-11-16'],
+        'temperature_2m_max': [30.5, 29.0],
+        'temperature_2m_min': [19.5, 18.0],
+        'weather_code': [0, 2],
       },
     };
 
@@ -69,6 +76,13 @@ void main() {
         'relative_humidity_2m': [65, 68],
         'precipitation_probability': [10, 15],
         'weather_code': [2, 3],
+        'is_day': [0, 0],
+      },
+      'daily': {
+        'time': ['2026-11-15', '2026-11-16'],
+        'temperature_2m_max': [30.5, 29.0],
+        'temperature_2m_min': [19.5, 18.0],
+        'weather_code': [0, 2],
       },
     };
 

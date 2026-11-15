@@ -8,12 +8,16 @@ class CurrentWeatherCard extends StatelessWidget {
   final Color accentColor;
   final WeatherCondition condition;
   final double? temperature;
+  final double? maxTemperature;
+  final double? minTemperature;
 
   const CurrentWeatherCard({
     super.key,
     required this.accentColor,
     required this.condition,
     required this.temperature,
+    required this.maxTemperature,
+    required this.minTemperature,
   });
 
   IconData get weatherIcon {
@@ -105,14 +109,18 @@ class CurrentWeatherCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'H: 30°',
+                    maxTemperature == null
+                        ? 'H: --°'
+                        : 'H: ${maxTemperature!.round()}°',
                     style: TextStyle(color: accentColor, fontSize: 17),
                   ),
 
                   const SizedBox(width: 25),
 
                   Text(
-                    'L: 19°',
+                    minTemperature == null
+                        ? 'L: --°'
+                        : 'L: ${minTemperature!.round()}°',
                     style: TextStyle(color: accentColor, fontSize: 17),
                   ),
                 ],

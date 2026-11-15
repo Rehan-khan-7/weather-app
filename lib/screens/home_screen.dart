@@ -199,12 +199,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       condition: widget.condition,
                       temperature:
                           weatherProvider.weatherData?.current.temperature,
+                      maxTemperature: weatherProvider
+                          .weatherData
+                          ?.daily
+                          .firstOrNull
+                          ?.maxTemperature,
+                      minTemperature: weatherProvider
+                          .weatherData
+                          ?.daily
+                          .firstOrNull
+                          ?.minTemperature,
                     ),
 
                     const SizedBox(height: 35),
 
                     // Hourly Forecast Heading
-                    const HourlyForecast(),
+                    HourlyForecast(
+                      hourly: weatherProvider.weatherData?.hourly ?? [],
+                      currentTime: weatherProvider.weatherData?.current.time,
+                    ),
 
                     const SizedBox(height: 35),
 
